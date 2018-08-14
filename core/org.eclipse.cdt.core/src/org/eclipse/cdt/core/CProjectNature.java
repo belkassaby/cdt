@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -49,6 +50,13 @@ public class CProjectNature implements IProjectNature {
 	}
 
 	/**
+	 * @since 6.5
+	 */
+	public static CProjectNature getCNature(IProject project, IProgressMonitor mon) throws CoreException {
+		return getCNature(project, C_NATURE_ID, mon);
+	}
+
+	/**
 	 * Utility method for adding a nature to a project.
 	 *
 	 * @param project
@@ -60,22 +68,23 @@ public class CProjectNature implements IProjectNature {
 	 *            or <code>null</code> if progress reporting is not required.
 	 *
 	 */
-	public static void addNature(IProject project, String natureId, IProgressMonitor monitor) throws CoreException {
-	    try {
-	        if (monitor == null) {
-	            monitor = new NullProgressMonitor();
-	        }
-    		IProjectDescription description = project.getDescription();
-    		String[] prevNatures = description.getNatureIds();
-    		for (String prevNature : prevNatures) {
-    			if (natureId.equals(prevNature))
-    				return;
-    		}
-    		String[] newNatures = new String[prevNatures.length + 1];
-    		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-    		newNatures[prevNatures.length] = natureId;
-    		description.setNatureIds(newNatures);
-    		project.setDescription(description, monitor);
+	public static void addNature(IProject project, String natureId, IProgressMonitor monitor)
+			throws CoreException {
+		try {
+			if (monitor == null) {
+				monitor = new NullProgressMonitor();
+			}
+			IProjectDescription description = project.getDescription();
+			String[] prevNatures = description.getNatureIds();
+			for (String prevNature : prevNatures) {
+				if (natureId.equals(prevNature))
+					return;
+			}
+			String[] newNatures = new String[prevNatures.length + 1];
+			System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
+			newNatures[prevNatures.length] = natureId;
+			description.setNatureIds(newNatures);
+			project.setDescription(description, monitor);
 		}
 
 		catch (CoreException e) {
@@ -98,13 +107,48 @@ public class CProjectNature implements IProjectNature {
 	 *            a progress monitor to indicate the duration of the operation,
 	 *            or <code>null</code> if progress reporting is not required.
 	 */
-	public static void removeNature(IProject project, String natureId, IProgressMonitor monitor) throws CoreException {
+	public static void removeNature(IProject project, String natureId, IProgressMonitor monitor)
+			throws CoreException {
 		IProjectDescription description = project.getDescription();
 		String[] prevNatures = description.getNatureIds();
 		List<String> newNatures = new ArrayList<String>(Arrays.asList(prevNatures));
 		newNatures.remove(natureId);
 		description.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
 		project.setDescription(description, monitor);
+	}
+
+	/**
+	 * @since 6.5
+	 */
+	public static CProjectNature getCNature(IResource resource) {
+		if (resource == null) {
+			return null;
+		}
+		return getPythonNature(resource.getProject());
+	}
+
+	/**
+	 * Utility method for getting a project nature from a project.
+	 *
+	 * @param project
+	 *            the project to get the nature from
+	 * @param natureId
+	 *            the nature id to get
+	 * @param monitor
+	 *            a progress monitor to indicate the duration of the operation,
+	 *            or <code>null</code> if progress reporting is not required.
+	 * @since 6.5
+	 */
+	public static CProjectNature getCNature(IProject project, String natureId, IProgressMonitor monitor)
+			throws CoreException {
+		IProjectDescription description = project.getDescription();
+		String[] prevNatures = description.getNatureIds();
+		List<String> newNatures = new ArrayList<String>(Arrays.asList(prevNatures));
+		for (String nature : newNatures) {
+			if (nature.equals(natureId))
+				return new CProjectNature(project);
+		}
+		return null;
 	}
 
 	/**

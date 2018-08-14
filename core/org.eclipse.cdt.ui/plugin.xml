@@ -3922,8 +3922,8 @@
           </enablement>
        </actionProvider>
        <actionProvider
-             class="org.eclipse.cdt.internal.ui.navigator.CNavigatorRefactorActionProvider"
-             id="org.eclipse.cdt.ui.navigator.actions.refactor"
+             class="org.eclipse.cdt.internal.ui.refactoring.rename.resources.CRefactorActionProvider"
+             id="org.eclipse.cdt.ui.navigator.actions.rename.refactor"
              overrides="org.eclipse.ui.navigator.resources.actions.RefactorActions">
           <enablement>
 			<or>
@@ -4048,6 +4048,9 @@
            </or>
         </possibleDropTargets>
      </dropAssistant>
+     <actionProvider
+           class="org.eclipse.cdt.ui.CommonActionProvider1">
+     </actionProvider>
     </navigatorContent>
     <commonFilter
           class="org.eclipse.cdt.internal.ui.filters.ExecutableFilter"
