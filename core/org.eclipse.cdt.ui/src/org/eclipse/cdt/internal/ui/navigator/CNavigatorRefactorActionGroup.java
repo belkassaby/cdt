@@ -13,6 +13,7 @@ package org.eclipse.cdt.internal.ui.navigator;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.widgets.Tree;
@@ -40,14 +41,18 @@ public class CNavigatorRefactorActionGroup extends ActionGroup {
 
 	private Tree tree;
 
+	private ISelectionProvider selectionProvider;
+
 	/**
 	 *  
-	 * @param aShell
-	 * @param aTree
+	 * @param shellProvider
+	 * @param selectionProvider
+	 * @param tree
 	 */
-	public CNavigatorRefactorActionGroup(IShellProvider aShell, Tree aTree) {
-		shellProvider = aShell;
-		tree = aTree;
+	public CNavigatorRefactorActionGroup(IShellProvider shellProvider, ISelectionProvider selectionProvider, Tree tree) {
+		this.shellProvider = shellProvider;
+		this.selectionProvider = selectionProvider;
+		this.tree = tree;
 		makeActions();
 	}
 
@@ -79,7 +84,8 @@ public class CNavigatorRefactorActionGroup extends ActionGroup {
 		moveAction = new MoveResourceAction(shellProvider);
 		moveAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_MOVE);
 		
-		renameAction = new RenameResourceAction(shellProvider, tree);
+		// custom resource rename action
+		renameAction = new CNavigatorRenameResourceAction(shellProvider, selectionProvider, tree);
 		renameAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_RENAME);
 	}
 

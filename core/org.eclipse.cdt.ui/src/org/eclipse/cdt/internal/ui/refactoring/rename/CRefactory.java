@@ -95,6 +95,26 @@ public class CRefactory {
         RenameSupport.openDialog(shell, refactoring);
 	}
 
+	/**
+	 * Rename a resource file selected in the navigator
+	 * 
+	 * @param shell
+	 * @param selected
+	 */
+	public void renameResource(Shell shell, IResource selected) {
+		if (!(selected instanceof IFile)) {
+			return;
+		}
+		if (!IDE.saveAllEditors(new IResource[] { ResourcesPlugin.getWorkspace().getRoot() }, false)) {
+			return;
+		}
+		CRefactoringArgument iarg = new CRefactoringArgument((IFile) selected);
+		iarg.setName(selected.getName());
+		final CRenameProcessor processor = new CRenameProcessor(this, iarg);
+		CRenameRefactoring refactoring = new CRenameRefactoring(processor);
+		RenameSupport.openRenameResourceDialog(shell, refactoring, selected.getName());
+	}
+
     public TextSearchWrapper getTextSearch() {
         if (fTextSearch == null) {
             return new TextSearchWrapper();

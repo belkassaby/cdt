@@ -13,7 +13,7 @@ package org.eclipse.cdt.internal.ui.refactoring.rename;
 
 import org.eclipse.osgi.util.NLS;
 
-class RenameMessages extends NLS {
+public class RenameMessages extends NLS {
     public static String ASTManager_error_macro_name_conflict;
 	public static String ASTManager_subtask_analyzing;
 	public static String ASTManager_task_analyze;
@@ -26,6 +26,7 @@ class RenameMessages extends NLS {
 	public static String CRefactoringMatch_label_occurrences;
 	public static String CRefactoringMatch_label_potentialOccurrences;
 	public static String CRefactory_title_rename;
+	public static String CRefactory_resource_rename;
 	public static String CRenameIncludeProcessor_includeDirective;
 	public static String CRenameLocalProcessor_constructor;
 	public static String CRenameLocalProcessor_enumerator;
@@ -79,6 +80,7 @@ class RenameMessages extends NLS {
 	public static String CRenameRefactoringInputPage_label_newName;
 	public static String CRenameRefactoringInputPage_label_updateWithin;
 	public static String CRenameRefactoringInputPage_renameBaseAndDerivedMethods;
+	public static String CRenameRefactoringInputPage_link_preference;
 	public static String CRenameTopProcessor_enumerator;
 	public static String CRenameTopProcessor_error_invalidName;
 	public static String CRenameTopProcessor_error_invalidTextSelection;

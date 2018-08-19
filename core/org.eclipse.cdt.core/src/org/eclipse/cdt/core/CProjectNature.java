@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -46,6 +47,13 @@ public class CProjectNature implements IProjectNature {
 
 	public static void removeCNature(IProject project, IProgressMonitor mon) throws CoreException {
 		removeNature(project, C_NATURE_ID, mon);
+	}
+
+	/**
+	 * @since 6.6
+	 */
+	public static CProjectNature getCNature(IProject project, IProgressMonitor mon) throws CoreException {
+		return getCNature(project, C_NATURE_ID, mon);
 	}
 
 	/**
@@ -105,6 +113,40 @@ public class CProjectNature implements IProjectNature {
 		newNatures.remove(natureId);
 		description.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
 		project.setDescription(description, monitor);
+	}
+
+	/**
+	 * @since 6.6
+	 */
+	public static CProjectNature getCNature(IResource resource) {
+		if (resource == null) {
+			return null;
+		}
+		return getCNature(resource.getProject());
+	}
+
+	/**
+	 * Utility method for getting a project nature from a project.
+	 *
+	 * @param project
+	 *            the project to get the nature from
+	 * @param natureId
+	 *            the nature id to get
+	 * @param monitor
+	 *            a progress monitor to indicate the duration of the operation,
+	 *            or <code>null</code> if progress reporting is not required.
+	 * @since 6.5
+	 */
+	public static CProjectNature getCNature(IProject project, String natureId, IProgressMonitor monitor)
+			throws CoreException {
+		IProjectDescription description = project.getDescription();
+		String[] prevNatures = description.getNatureIds();
+		List<String> newNatures = new ArrayList<String>(Arrays.asList(prevNatures));
+		for (String nature : newNatures) {
+			if (nature.equals(natureId))
+				return new CProjectNature(project);
+		}
+		return null;
 	}
 
 	/**

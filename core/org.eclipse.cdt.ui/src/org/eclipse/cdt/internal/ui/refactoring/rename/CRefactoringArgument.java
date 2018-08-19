@@ -51,6 +51,13 @@ public class CRefactoringArgument {
     private IScope fScope;
     private IASTTranslationUnit fTranslationUnit;
 
+    public CRefactoringArgument(IFile file) {
+    	fKind = CRefactory.ARGUMENT_FILE_LOCAL_VAR;
+    	fFile = file;
+    	fOffset = CRefactory.ARGUMENT_UNKNOWN;
+    	fLength = CRefactory.ARGUMENT_UNKNOWN;
+    }
+
     public CRefactoringArgument(IFile file, int offset, int length) {
         fKind= CRefactory.ARGUMENT_UNKNOWN;
         fFile= file;

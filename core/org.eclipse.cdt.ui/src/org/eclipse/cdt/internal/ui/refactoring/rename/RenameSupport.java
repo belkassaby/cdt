@@ -30,6 +30,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.ui.CUIPlugin;
 
+import org.eclipse.cdt.internal.ui.navigator.CNavigatorResourceRenameRefactoringWizard;
 import org.eclipse.cdt.internal.ui.refactoring.RefactoringExecutionHelper;
 import org.eclipse.cdt.internal.ui.refactoring.RefactoringStarter;
 
@@ -214,6 +215,70 @@ public class RenameSupport {
         	CUIPlugin.log(e);
 		}
         return DialogResult.CANCELED;
+	}
+
+	/**
+	 * Opens the refactoring dialog for a given rename refactoring.
+	 *
+	 * @param shell a shell used as a parent for the refactoring dialog.
+	 * @param refactoring the refactoring object.
+	 *
+	 * @see #openDialog(Shell, boolean)
+	 */
+	public static void openRenameResourceDialog(Shell shell, CRenameRefactoring refactoring, String initialValue) {
+		openRenameResourceDialog(shell, refactoring, DialogMode.ALL_PAGES, initialValue);
+	}
+
+	/**
+	 * Opens the refactoring dialog.
+	 *
+	 * <p>
+	 * This method has to be called from within the UI thread.
+	 * </p>
+	 *
+	 * @param shell A shell used as a parent for the refactoring, preview, or error dialog
+	 * @param refactoring The refactoring.
+	 * @param mode One of DialogMode values. ALL_PAGES opens wizard with all pages shown;
+	 *     PREVIEW_ONLY opens the preview page only; CONDITIONAL_PREVIEW opens the wizard with
+	 *     preview page only and only if a warning was generated during the final conditions check.
+	 * @return One of DialogResult values. OK is returned if the dialog was shown and
+	 *     the refactoring change was applied; CANCELED is returned if the refactoring was
+	 *     cancelled. SKIPPED is returned if the dialog was skipped in CONDITIONAL_PREVIEW mode and
+	 *     the refactoring change has not been applied yet.
+	 */
+	static DialogResult openRenameResourceDialog(Shell shell, CRenameRefactoring refactoring, final DialogMode mode, String initialValue) {
+		try {
+			final boolean[] dialogSkipped = new boolean[1];
+			CNavigatorResourceRenameRefactoringWizard wizard = new CNavigatorResourceRenameRefactoringWizard(
+					refactoring, RenameMessages.CRefactory_resource_rename,
+					RenameMessages.CRefactory_resource_rename, initialValue);
+			RefactoringStarter starter = new RefactoringStarter();
+			CRenameProcessor processor = refactoring.getProcessor();
+			processor.lockIndex();
+			try {
+				RefactoringStatus status = processor.checkInitialConditions(new NullProgressMonitor());
+				if (status.hasFatalError()) {
+					showInformation(shell, status);
+					return DialogResult.CANCELED;
+				}
+				if (starter.activate(wizard, shell, RenameMessages.CRefactory_resource_rename,
+						processor.getSaveMode())) {
+					return DialogResult.OK;
+				}
+				if (dialogSkipped[0]) {
+					// If the dialog was not shown, it is our responsibility to close it.
+					wizard.getContainer().getShell().close();
+					return DialogResult.SKIPPED;
+				}
+			} finally {
+				processor.unlockIndex();
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} catch (CoreException e) {
+			CUIPlugin.log(e);
+		}
+		return DialogResult.CANCELED;
 	}
 
 	/**
